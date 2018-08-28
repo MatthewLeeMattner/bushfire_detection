@@ -30,7 +30,7 @@ def load_csv_image(csv_location):
 
 def get_data_from_folder(location):
     image_matrix = []
-    files = get_files(folder_abs)
+    files = get_files(location)
     for file in files:
         if file.split(".")[-1] == "csv" and file.split("_")[-1].split(".")[0] == "data":
             img = load_csv_image("{}/{}".format(location, file))
@@ -66,18 +66,90 @@ def random_sample(arr, w, h, not_allowed_pairs):
 
 
 def slice_section(arr, x, y, w, h):
-    x_axis_neg, x_axis_pos = int(x - (w / 2)) + 1, int(x + (w / 2)) + 1
-    y_axis_neg, y_axis_pos = int(y - (h / 2)) + 1, int(y + (h / 2)) + 1
+    x_axis_neg, x_axis_pos = x - int((w / 2)), x + int((w / 2)) + 1
+    y_axis_neg, y_axis_pos = y - int((h / 2)), y + int((h / 2)) + 1
     result = arr[y_axis_neg:y_axis_pos, x_axis_neg:x_axis_pos]
     return result
 
 
 def colour_slice_section(arr, x, y, w, h):
-    x_axis_neg, x_axis_pos = int(x - (w / 2)) + 1, int(x + (w / 2)) + 1
-    y_axis_neg, y_axis_pos = int(y - (h / 2)) + 1, int(y + (h / 2)) + 1
+    x_axis_neg, x_axis_pos = int(x - (w / 2)) + 1, int(x + (w / 2))
+    y_axis_neg, y_axis_pos = int(y - (h / 2)) + 1, int(y + (h / 2))
     img = np.copy(arr)
     img[y_axis_neg:y_axis_pos, x_axis_neg:x_axis_pos] = 1
     return img
+
+
+def add_padding(arr, padding=2):
+    return np.pad(arr, [(padding, padding), (padding, padding), (0, 0)], mode='constant')
+
+
+def slice_image(image, w, h, padding=2):
+    y_width, x_width, z_width = image.shape
+    image = add_padding(image)
+
+    slices = []
+
+    for y in range(y_width):
+        for x in range(x_width):
+            slice = slice_section(image, x+2, y+2, w, h)
+            if slice.shape[0] is not 5:
+                print(x, y)
+                break
+
+            elif slice.shape[1] is not 5:
+                print(x, y)
+                break
+
+            slice = np.reshape(slice, (400))
+            slices.append(slice)
+    slices = np.array(slices)
+    slices = np.reshape(slices, (slices.shape[0], 5, 5, 16))
+    return slices
+
+
+def softmax(X, theta=1.0, axis=None):
+    """
+    Compute the softmax of each element along an axis of X.
+
+    Parameters
+    ----------
+    X: ND-Array. Probably should be floats.
+    theta (optional): float parameter, used as a multiplier
+        prior to exponentiation. Default = 1.0
+    axis (optional): axis to compute values along. Default is the
+        first non-singleton axis.
+
+    Returns an array the same size as X. The result will sum to 1
+    along the specified axis.
+    """
+
+    # make X at least 2d
+    y = np.atleast_2d(X)
+
+    # find axis
+    if axis is None:
+        axis = next(j[0] for j in enumerate(y.shape) if j[1] > 1)
+
+    # multiply y against the theta parameter,
+    y = y * float(theta)
+
+    # subtract the max for numerical stability
+    y = y - np.expand_dims(np.max(y, axis=axis), axis)
+
+    # exponentiate y
+    y = np.exp(y)
+
+    # take the sum along the specified axis
+    ax_sum = np.expand_dims(np.sum(y, axis=axis), axis)
+
+    # finally: divide elementwise
+    p = y / ax_sum
+
+    # flatten if X was 1D
+    if len(X.shape) == 1: p = p.flatten()
+
+    return p
 
 
 if __name__ == "__main__":
