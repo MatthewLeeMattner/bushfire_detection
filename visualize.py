@@ -7,19 +7,24 @@ import numpy as np
 from read_data import slice_image
 
 
-def heatmap_display(outputs):
+def heatmap_display(outputs, cmap="coolwarm"):
     fig, ax = plt.subplots(figsize=(10, 12.25))
     ax.set_yticks([])
     ax.set_xticks([])
-    sns.heatmap(outputs, cmap="coolwarm", ax=ax)
+    sns.heatmap(outputs, cmap=cmap, ax=ax)
 
 
 def convert_output_to_heatmap(outputs, shape, threshold=None):
     arr = []
-    for fire, not_fire in outputs:
-        arr.append(fire - not_fire)
-    arr = np.array(arr)
-    arr = (arr - arr.min()) / (arr.max() - arr.min())
+    if len(outputs.shape) is not 2:
+        for output in outputs:
+            arr.append(output)
+        arr = np.array(arr)
+    else:
+        for not_fire, fire in outputs:
+            arr.append(fire - not_fire)
+        arr = np.array(arr)
+        arr = (arr - arr.min()) / (arr.max() - arr.min())
 
     if threshold is not None:
         for i in range(len(arr)):
