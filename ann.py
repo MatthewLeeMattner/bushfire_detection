@@ -37,6 +37,7 @@ class ArtificialNeuralNetwork:
                 self.y: labels
             })
             print(c)
+        return self
 
     def predict(self, features):
         outputs = self.sess.run(self.output, feed_dict={
@@ -59,7 +60,7 @@ if __name__ == "__main__":
     print(X.shape)
     print(y.shape)
 
-    ann = ArtificialNeuralNetwork()
+    ann = ArtificialNeuralNetwork(epochs=50)
     ann.fit(X, y)
     result = ann.predict(X)
     print(result)

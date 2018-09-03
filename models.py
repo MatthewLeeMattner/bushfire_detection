@@ -41,7 +41,9 @@ def main(model, X, y, name):
 
 if __name__ == "__main__":
     import numpy as np
-    from sklearn.linear_model import LinearRegression
+    #from sklearn.linear_model import LinearRegression
+    from ann import ArtificialNeuralNetwork
+
     X = np.load("data/features.npy")
     y = np.load("data/labels.npy")
     image_folder = "{}/{}".format(data_abs["fire"], "201805312300")
@@ -49,7 +51,7 @@ if __name__ == "__main__":
     X_train = np.reshape(X, (X.shape[0], X.shape[1] * X.shape[2] * X.shape[3]))
     X_train = np.nan_to_num(X_train)
 
-    model = LinearRegression(normalize=True)
-
-    main(model, X_train, y, "linear_regression")
+    #model = LinearRegression(normalize=True)
+    model = ArtificialNeuralNetwork(epochs=25)
+    main(model, X_train, y, "neural_network")
 
