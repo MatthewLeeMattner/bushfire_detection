@@ -1,7 +1,7 @@
 '''
     Read the data in and format it
 '''
-
+import os
 from os import listdir
 from os.path import isfile, join
 from random import randint
@@ -155,7 +155,7 @@ def softmax(X, theta=1.0, axis=None):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    data_type = "fire"
+    data_types = ["maybe_fire"]
 
     slice_size = (5, 5)
 
@@ -165,12 +165,15 @@ if __name__ == "__main__":
         (89, 112), (90, 112), (91, 112)
     ]
 
+    all_folder = []
     images = []
-    folders = get_folders(data_abs[data_type])
-    for folder in folders:
-        folder_abs = "{}/{}".format(data_abs[data_type], folder)
-        img_arr = get_data_from_folder(folder_abs)
-        images.append(img_arr)
+    for data_type in data_types:
+        folders = get_folders(data_abs[data_type])
+        for folder in folders:
+            folder_abs = "{}/{}".format(data_abs[data_type], folder)
+            img_arr = get_data_from_folder(folder_abs)
+            images.append(img_arr)
+            all_folder.append(folder_abs)
 
     images = np.array(images)
     print(images.shape)
@@ -184,22 +187,42 @@ if __name__ == "__main__":
     metadata = []
 
     for i, image in enumerate(images):
-        folder_name = folders[i]
+        folder_name = all_folder[i]
         for x, y in fire_data:
             feature = slice_section(image, x, y, *slice_size)
             features.append(feature)
-            labels.append([1, 0])
+            labels.append([0, 1])
             metadata.append((x, y, folder_name))
 
         for i in range(9):
             feature, x, y = random_sample(image, *slice_size, fire_data)
             features.append(feature)
-            labels.append([0, 1])
+            labels.append([1, 0])
             metadata.append((x, y, folder_name))
+    '''
+    not_fire_images = []
+    not_fire_folders = get_folders(data_abs["not_fire"])
+    for folder in not_fire_folders:
+        folder_abs = "{}/{}".format(data_abs["not_fire"], folder)
+        img_arr = get_data_from_folder(folder_abs)
+        not_fire_images.append(img_arr)
 
+    for i in range(4):
+        image = not_fire_images[i]
+        folder_name = not_fire_folders[i]
+        for x, y in fire_data:
+            feature = slice_section(image, x, y, *slice_size)
+            features.append(feature)
+            labels.append([1, 0])
+            metadata.append((x, y, folder_name))
+    '''
     features = np.array(features)
     labels = np.array(labels)
     metadata = np.array(metadata)
+
+    if not os.path.exists("data"):
+        os.makedirs("data")
+
 
     print("Features: ", features.shape)
     print("Labels: ", labels.shape)

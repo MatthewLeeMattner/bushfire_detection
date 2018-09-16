@@ -10,32 +10,38 @@ class ArtificialNeuralNetwork:
         self.optimizer, self.cost = self.backprop(self.output, self.y)
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
+        self.merged = tf.summary.merge_all()
+        self.train_writer = tf.summary.FileWriter("tensorboard/", self.sess.graph)
 
     def model(self):
         self.X = tf.placeholder(tf.float32, shape=(None, 400), name="features")
         self.y = tf.placeholder(tf.float32, shape=(None, 2), name="labels")
 
-        x1 = tf.layers.dense(self.X, units=200)
-        a1 = tf.nn.tanh(x1)
-
-        x2 = tf.layers.dense(a1, units=100)
-        a2 = tf.nn.tanh(x2)
-
-        x3 = tf.layers.dense(a2, units=2)
+        with tf.name_scope("input_layer"):
+            x1 = tf.layers.dense(self.X, units=200)
+            a1 = tf.nn.tanh(x1)
+        with tf.name_scope("hidden_layer"):
+            x2 = tf.layers.dense(a1, units=100)
+            a2 = tf.nn.tanh(x2)
+        with tf.name_scope("output_layer"):
+            x3 = tf.layers.dense(a2, units=2)
 
         return x3
 
     def backprop(self, logits, labels):
-        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels, name="cost"))
-        optimizer = tf.train.AdamOptimizer().minimize(cost)
+        with tf.name_scope("backpropagation"):
+            cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels, name="cost"))
+            optimizer = tf.train.AdamOptimizer().minimize(cost)
+        tf.summary.scalar('cost', cost)
         return optimizer, cost
 
     def fit(self, features, labels):
         for e in range(self.epochs):
-            _, c = self.sess.run([self.optimizer, self.cost], feed_dict={
+            _, c, merged = self.sess.run([self.optimizer, self.cost, self.merged], feed_dict={
                 self.X: features,
                 self.y: labels
             })
+            self.train_writer.add_summary(merged, e)
             print(c)
         return self
 
