@@ -199,23 +199,7 @@ if __name__ == "__main__":
             features.append(feature)
             labels.append([1, 0])
             metadata.append((x, y, folder_name))
-    '''
-    not_fire_images = []
-    not_fire_folders = get_folders(data_abs["not_fire"])
-    for folder in not_fire_folders:
-        folder_abs = "{}/{}".format(data_abs["not_fire"], folder)
-        img_arr = get_data_from_folder(folder_abs)
-        not_fire_images.append(img_arr)
 
-    for i in range(4):
-        image = not_fire_images[i]
-        folder_name = not_fire_folders[i]
-        for x, y in fire_data:
-            feature = slice_section(image, x, y, *slice_size)
-            features.append(feature)
-            labels.append([1, 0])
-            metadata.append((x, y, folder_name))
-    '''
     features = np.array(features)
     labels = np.array(labels)
     metadata = np.array(metadata)
