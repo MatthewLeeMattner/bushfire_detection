@@ -1,33 +1,13 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import mpl_toolkits.mplot3d.axes3d as axes3d
 
-
-
-
-arr = np.array([
-    [5, 7],
-    [0.2, 0.222],
-    [0.9, 0.2]
-])
-
-print(softmax(arr, axis=1))
-'''
-from read_data import slice_image
-
-arr = np.array(range(15))
-arr = arr[2:7]
-print(arr)
-
-
-
-
-arr = np.arange(1, 26)
-print(arr.shape)
-arr = arr.reshape((5, 5, 1))
-print(arr.shape)
-
-result = slice_image(arr, 5, 5)
-print(result.shape)
-print(result[0])
-print("_____________")
-print(result[5])
-'''
+np.random.seed(1)
+fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
+ax.tick_params(axis='x', length=20)
+#fig.set_size_inches(18.5, 3.5, forward=True)
+N = 100
+X, Y = np.meshgrid(np.arange(N), np.arange(500))
+heights = np.random.randn(500, N)
+ax.plot_surface(X, Y, heights, cmap=plt.get_cmap('jet'))
+plt.show()
