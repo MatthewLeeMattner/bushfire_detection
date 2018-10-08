@@ -87,5 +87,8 @@ In order to run a model the object is required to have a 'fit' and 'predict'
 this can be seen in the ann.py file where the neural network model is defined.
 
 ## Visualize
-This contains all the functions for generating the 2D and 3D heatmaps
+This contains all the functions for generating the 2D and 3D heatmaps. 
+The model outputs a prediction for each pixel as either 1.0 for extremely probable of fire
+or 0.0 for no fire. Confidence values can output as float values between 0 and 1
+which create a gradient. See colour bar in the image below
 ![heatmap](images/heatmap.png)
