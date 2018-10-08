@@ -3,11 +3,11 @@
 '''
 
 data = {
-    "location": "/media/matthewlee/DATA/data/Bushfire",
-    "outputs": "/media/matthewlee/DATA/data/Bushfire/outputs",
-    "fire": "with fire",
-    "maybe_fire": "may have fire",
-    "not_fire": "without fire"
+    "location": "D:/data/GOES",
+    "outputs": "D:/data/GOES/outputs",
+    "fire": "with_fire",
+    "maybe_fire": "maybe_fire",
+    "not_fire": "without_fire"
 }
 
 data_abs = {

@@ -1,10 +1,45 @@
 from random import randint
 
 import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
 
 from read_data import slice_image
+
+
+def clip_padding(matrix, size=2):
+    return matrix[size:-size, size:-size]
+
+
+
+def mesh_display(outputs, cmap="coolwarm"):
+    outputs = clip_padding(outputs)
+    fig = plt.figure(figsize=(40, 10))
+    ax = fig.gca(projection='3d')
+    ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    ax.set_xlim3d(0, 222)
+    ax.set_ylim3d(0, 181)
+    ax.view_init(40, 300)
+    # Make data.
+    X = range(outputs.shape[0])
+    Y = range(outputs.shape[1])
+    X, Y = np.meshgrid(X, Y)
+    Z = outputs.T
+
+    # Plot the surface.
+    surf = ax.plot_surface(X, Y, Z, cmap=cmap,
+                           linewidth=0, antialiased=True, shade=True)
+
+    # Customize the z axis.
+    ax.set_zlim(-2, 2.00)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=10)
 
 
 def heatmap_display(outputs, cmap="coolwarm"):
@@ -22,7 +57,7 @@ def convert_output_to_heatmap(outputs, shape, threshold=None):
         arr = np.array(arr)
     else:
         for not_fire, fire in outputs:
-            arr.append(fire - not_fire)
+            arr.append(not_fire - fire)
         arr = np.array(arr)
         arr = (arr - arr.min()) / (arr.max() - arr.min())
 
